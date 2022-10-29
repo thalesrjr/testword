@@ -36,6 +36,8 @@ function app(){
         app_scaffold ${*:2}
     elif [ $1 == "migrate" ]; then
         app rails db:migrate
+    elif [ $1 == "remove" ]; then
+        remove_app
     else
         docker-compose run app $@
     fi
