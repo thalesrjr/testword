@@ -1,6 +1,16 @@
+
 #!/bin/bash
 
 #funções uteis
+function getEnv(){
+    eval "$(
+    cat .env | awk '!/^\s*#/' | awk '!/^\s*$/' | while IFS='' read -r line; do
+        key=$(echo "$line" | cut -d '=' -f 1)
+        value=$(echo "$line" | cut -d '=' -f 2-)
+        echo "export $key=\"$value\""
+    done
+    )"
+}
 function user_docker(){
     if id -nG "$USER" | grep -qw "docker"; then
         echo $USER belongs to docker group
@@ -15,11 +25,20 @@ function enter(){
 }
 
 function app(){
-    docker-compose run app $@
-}
-
-function app(){
-    docker-compose run app $@
+    if [ $1 == "new" ]; then
+        echo criando $2
+        new_app
+        app_turbolink_remove
+    elif [ $1 == "enter" ]; then
+        getEnv
+        enter $APP_NAME-app
+    elif [ $1 == "scaffold" ]; then
+        app_scaffold ${*:2}
+    elif [ $1 == "migrate" ]; then
+        app rails db:migrate
+    else
+        docker-compose run app $@
+    fi
 }
 
 function new_app(){
@@ -66,10 +85,11 @@ function remove_app(){
     sudo rm -rf Rakefile 
     sudo rm -rf .ruby-version 
     sudo rm -rf Gemfile
+    sudo rm -rf docker-compose/postgres
 }
 
-function migrate(){
-    app rails db:drop db:create db:migrate db:seed
+app_turbolink_remove(){
+   sudo sed -i "10c<%#= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %> <!--trecho desabilitado pelo start.sh-->" app/views/layouts/application.html.erb
 }
 
 function permissions_update(){
@@ -84,6 +104,8 @@ function permissions_update(){
     sudo chown -R $USER:$USER start.sh
     sudo chown -R $USER:$USER docker-compose/Gemfile
     sudo chown -R $USER:$USER docker-compose/functions.sh
+    sudo chown -R $USER:$USER config/master.key
+    sudo chown -R $USER:$USER db/migrate
     echo permissões atualisadas!
 }
 
@@ -125,7 +147,7 @@ function restart(){
 
 function se_existe(){
     file=$1
-    if [ -f "$file" ]
+    if [ -f "$file" ] || [ -d "$file" ]
     then
         $2
     fi
