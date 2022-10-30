@@ -29,6 +29,7 @@ function app(){
         echo criando $2
         new_app
         app_turbolink_remove
+        atualiza_nome_app $2
     elif [ $1 == "enter" ]; then
         getEnv
         enter $APP_NAME-app
@@ -91,7 +92,11 @@ function remove_app(){
 }
 
 app_turbolink_remove(){
-   sudo sed -i "10c<%#= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %> <!--trecho desabilitado pelo start.sh-->" app/views/layouts/application.html.erb
+   sudo sed -i "10c    <%#= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %> <!--trecho desabilitado pelo start.sh-->" app/views/layouts/application.html.erb
+}
+
+atualiza_nome_app(){
+   sudo sed -i "1cAPP_NAME="$1 .env
 }
 
 function permissions_update(){
