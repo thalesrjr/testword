@@ -13,15 +13,15 @@ git reset --hard origin/main
 ```
 source start.sh
 ```
-# Atualiza dependencias (gems)
+# Atualize as dependencias (gems)
 ```
 app bundle
 ```
-# Cria o banco de dados
+# Crie o banco de dados
 ```
 app rails db:create
 ```
-# Migra as tablas para o bd
+# Migre as tablas para o bd
 ```
 app rails db:migrate
 ```
