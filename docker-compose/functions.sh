@@ -30,6 +30,7 @@ function app(){
         new_app
         app_turbolink_remove
         atualiza_nome_app $2
+        docker-compose up -d
     elif [ $1 == "enter" ]; then
         getEnv
         enter $APP_NAME-app
